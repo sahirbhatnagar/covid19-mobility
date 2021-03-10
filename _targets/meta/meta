@@ -1,0 +1,89 @@
+name|type|data|command|depend|seed|path|time|size|bytes|format|iteration|parent|children|seconds|warnings|error
+ses_path|stem|975aa4ea3a126a14|e05d29afe9ad7b69|ef46db3751d8e999|1235684583|data/COVID-19 Community Vulnerability Index (CCVI) - County CCVI.csv|c93479e19530bfbf|b693c784f70311f1|217678|file|vector|||3.639||
+safegraph_path|stem|1ac90a44a8882de2|ccb3889c51e84267|ef46db3751d8e999|583164666|data/2020_change_2020_baselines_Dec08.csv|1bcae16afdc1b956|fd8f12403dac0354|350841611|file|vector|||0.001||
+density_path|stem|98d7b3b30be1c575|f57dd43b675f92bd|ef46db3751d8e999|844540587|data/Average_Household_Size_and_Population_Density_-_County.csv|e5daf261e393ba60|3fbc3989f9c3a4b9|742826|file|vector|||0||
+nyt|stem|192543131900da5c|4d1c8965dc25b659|c3b5fc02cdc369c1|-99755826|_targets/objects/nyt|c52b8e46a4b560f3|ef337301792792c6|17081100|rds|vector|||20.686||
+state_names_sars2pack|stem|b9d0183eeaaf3cf7|4c3c8e3e9e1be281|c3b5fc02cdc369c1|875365134|_targets/objects/state_names_sars2pack|d56d3149c14c12d3|9b8616a75bf749a1|647944|rds|vector|||1.238|1 failed to parse.|
+safegraph|stem|fe992a8af311b6cd|4eab9158fefcd569|3a777229b4482403|777049995|_targets/objects/safegraph|c857c9be16bdcdce|d9f193afad004cc4|120186753|rds|vector|||12.667||
+density_data|stem|6c11e090dda1fe54|771b41e3fcc33780|7b3fd359fb159d45|-874081316|_targets/objects/density_data|587dbb1b47e2dfdb|9947017a9bc92ef2|201659|rds|vector|||0.081||
+lags|object|907ac6b7a38cb771||||||||||||||
+cbgam2|object|edd062861ce4de94||||||||||||||
+i|object|538781b9fa1f81e0||||||||||||||
+cen|object|f4066a65ff755f48||||||||||||||
+res|object|7b695f13255328dd||||||||||||||
+predsdgam2|object|9a20c55f3a017ba6||||||||||||||
+index|object|a2a52dfe4e065e93||||||||||||||
+state|object|834722eee60c0c38||||||||||||||
+metric_type|object|6f9a1037869137a5||||||||||||||
+src|object|3cfe14e3db54f891||||||||||||||
+cols|object|4472adfc849a0b32||||||||||||||
+predslgam2|object|cd8b20d440eab02e||||||||||||||
+gam2|object|39c80e53e9e748b8||||||||||||||
+perc|object|2fe2a9db4cb74d6c||||||||||||||
+gam_result|object|da6c0bd4725ac152||||||||||||||
+afsim|object|7754d67d68e02d21||||||||||||||
+outcome_type|object|7ec0d4f98478c841||||||||||||||
+est_af|object|40d4c641d450177a||||||||||||||
+est_ci|object|189b82385285cf0d||||||||||||||
+figure2_fun|function|8605ab0f8baa7261||||||||||||||
+.Random.seed|object|06b33fef26faeee4||||||||||||||
+figure4_3Dplots|stem|88f959231ac24023|90665132d2de7973|4dcafaaf9df2fd9a|904684746|figure4_3Dplots.pdf|6a32933dcba1f9bf|dce0e36648e59b62|99646|file|vector|||4.917||
+figure2_correlation_MI|stem|ea026113d3df2116|b5a7ee2b4b63100a|78c7e09b8e516f0c|2026864671|figure2_correlation.pdf|f62006af64e5513b|8737035cd89f8027|15177|file|vector|||4.929|Removed 24 rows containing nonfinite values stat_smooth.|
+fpca_data|stem|72067ef0acd5111c|7658935248bd4ba4|35d90bdd0cbc5013|2007750644|_targets/objects/fpca_data|76e73addaa7e41dd|441e6cc3ca10c47a|2392493|rds|vector|||30.123||
+ccvi|stem|ff5a2d336855cd55|fd2703f18abb9019|b8638ca4958cb7bb|1439284651|_targets/objects/ccvi|76267111b5522185|062479e4ebdd6479|1344|rds|vector|||3.592||
+params2|stem|0a80791f46f6aa5f|e8dd937e87a63012|9ff7e852f33d72b7|-2137255939|_targets/objects/params2|b61a24e1712ffbc8|42453b716dfde1f4|311|rds|vector|||3.714||
+suppfig1|stem|00b722040f6e8c72|6dcf7ba88914fa34|ce64af1c3e28a49f|-1568378878|suppfigure1_kmeans_stats.pdf|5d86af9818cccb2c|e7587d7e7250e717|8788|file|vector|||1.477||
+state_names|stem|5745807eb5ed7338|f8dc55186f4d7e7a|5c16828d72f8da68|-1426916882|_targets/objects/state_names|2e49d3e3987795f2|5d08f0f3fc77e108|626|rds|vector|||3.904||
+figure1_change_from_baseline|stem|7419f67b9f470a80|14c4676009b84627|b3266d73b0f032ae|-1556580542|figure1.pdf|40b0d2597df15e26|45fe0bd8303be469|16321|file|vector|||22.045|couldnt connect to display 0|
+state_names_list|stem|50f9c06e35a179b1|6f26d5591fc7b04f|2069f7fa2e8fa4eb|-794331432|_targets/objects/state_names_list|fe3d5db7e2d7d6b9|ba984c08f1495aa7|768|rds|vector|||0.009||
+pcplot_data|stem|8e642d6fcad451c9|98570400ce1f8761|93aa0d3a299aea10|-847520640|_targets/objects/pcplot_data|c37e7e7316d4bab8|a3390726f120f477|4016970|rds|vector|||16.39||
+fpca_cases_data|stem|fe04b4991daedfb5|d5e22282a1f129d4|35d90bdd0cbc5013|942584083|_targets/objects/fpca_cases_data|87bf4e7e693ae205|c53a3cce114c5f65|3249117|rds|vector|||21.687||
+suppfig3.1|stem|7a2529b5cf8401a7|d17df7c0f8f18ade|12df7d30b627e70b|581893128|suppfigure3_fpca_correlation_by_county_Ohio.pdf|e41bfbcedc8ac47d|58c6af53fc650094|8044|file|vector|||10.43||
+suppfig3.2|stem|8d749441dc688af1|7c64f82fc9fd4a96|12df7d30b627e70b|-1466038296|suppfigure3_fpca_correlation_by_county_Missouri.pdf|03150f7f2cd39979|4a6bc4f5f013f9b4|9177|file|vector|||10.713||
+suppfig3.3|stem|2d1cd6e98631f7e7|d4bdba9916fd314c|12df7d30b627e70b|-1238588667|suppfigure3_fpca_correlation_by_county_South Carolina.pdf|251dea0ab3d5dade|9c8ae88555db2e3c|6421|file|vector|||5.779||
+suppfig3.4|stem|380e25c2b46253fe|222796ccf95a9831|12df7d30b627e70b|1485203382|suppfigure3_fpca_correlation_by_county_Indiana.pdf|82ea583ae7122c5d|51dce6c51e9e71e0|8235|file|vector|||5.846||
+correlation_data|stem|46120f08ae2c159c|6a0eb640ca95af14|8734ae2ea647fe55|1251599098|_targets/objects/correlation_data|d3c5f2faee808a61|2c8aaa081566e297|44323|rds|vector|||21.631|the standard deviation is zero|
+figure3_CountyCloseReopen|stem|d5ebb13f10b78a1e|6c35f33497ec063a|fd6316028f4460cb|1567519260|figure3_CloseReopen.pdf|740cafe5c04a03a1|f4bbe7d20e2e7ce4|96492|file|vector|||10.747||
+map_gif|stem|97fb880371422a03|c56e64797d2f3222|e6adb3cc639c0fef|1807792493|map.gif|881d5c503d62b02c|0df907f814a1ff89|5578822|file|vector|||372.097||
+gam_res|stem|7a05d881dad802dc|fa1abe70b1c42adb|009830b9ea327173|540066325|_targets/objects/gam_res|a01f991883171987|a5bb59bfd95d47ce|121714255|rds|vector|||2237.453|model has repeated 1d smooths of same variable.|
+report|stem|80c975580a66a212|4b8ff961ac4bf87a|46c3acb108e407dd|-237041703|report_4states.html*report_4states.Rmd|f0a120fc4dfbd231|14166da0a5ed7833|41440803|file|vector|||176.887|MathJax doesnt work with self_contained when not using the rmarkdown default template.|
+input_params|function|f3c7eaea021b8d88||||||||||||||
+attrdl|function|6ce596c7e15957b1||||||||||||||
+map_cbg_to_fips|function|351a9d89219b81e2||||||||||||||
+ccvi_data|function|68bddf1b862bd7b4||||||||||||||
+CCVI_themes_fun|function|1694405c3572e98c||||||||||||||
+figure2_correlation_data|function|0e63a33450609153||||||||||||||
+fpca_pipeline_lag|function|817f0bfee90223ea||||||||||||||
+figure4_3Dplots_fun|function|24f961f422681230||||||||||||||
+map_gif_fun|function|194a3c03afecc2bb||||||||||||||
+figure2_correlation_plot|function|b35881086e54cc7a||||||||||||||
+suppfigure3_corr_by_county|function|5a021cef33006bc8||||||||||||||
+fpca_pipeline|function|44b7a77926fd8854||||||||||||||
+figure1_change_from_baseline_fun|function|a7aefcbad40d692a||||||||||||||
+figure3_CountyCloseReopen_fun|function|f39f4d18c0060df5||||||||||||||
+kmeans_state|function|0602be3d14a34cef||||||||||||||
+read_and_clean_cbg|function|f6139b6a5f6e6e24||||||||||||||
+cbg_path|stem|6b13408c205c642a|7c8aac4ceb41bdac|ef46db3751d8e999|-1242478232|data/cbg_fips_codes.csv|0c7a1f89fce575e3|bc0eae37598c9635|94256|file|vector|||0||
+params|stem|641bc00c7ea0000d|d453411aab44f854|1fb9f258f62bdc9b|890816472|_targets/objects/params|ce47cca422cc8a53|a38f23e054c8be1f|332|rds|vector|||0.064||
+cbg|stem|c49d4e7c4f169020|0aa4211c2e4cc247|4bfe93d2b32cc477|1953696687|_targets/objects/cbg|32a80d2f0037659c|b6eb688606b4d8d6|27797|rds|vector|||0.038||
+ses_data|stem|fc6fd3fef4a1b84c|8d449b10da583c55|2b6807811ed2184f|-537490927|_targets/objects/ses_data|42c0fcd7f31ddbf4|42d482931dc04ac7|79213|rds|vector|||0.058||
+popDensity|stem|b31e0a9e1debe708|bbb97838fa5c7cea|2966a1fb575dede3|668098942|_targets/objects/popDensity|e19616c383d7be64|6581f2666a6db1e6|47483|rds|vector|||0.008||
+SES|stem|c92c447b6250bffb|9348ff6aed86929e|f25c4d03566e6c12|838647330|_targets/objects/SES|61706cbf616de834|b1c79cfaede8f6a0|52812|rds|vector|||0.049||
+CCVI_themes|stem|8410b779a2bbe1a2|244053117aa19b98|5d19e00136d758a2|38068160|CCVI_themes.pdf|93123bf2dfbf8a87|41bcad5975e551d0|59051|file|vector|||12.176||
+input_params|function|f3c7eaea021b8d88
+attrdl|function|6ce596c7e15957b1
+map_cbg_to_fips|function|351a9d89219b81e2
+ccvi_data|function|68bddf1b862bd7b4
+CCVI_themes_fun|function|1694405c3572e98c
+figure2_correlation_data|function|0e63a33450609153
+fpca_pipeline_lag|function|817f0bfee90223ea
+figure4_3Dplots_fun|function|24f961f422681230
+map_gif_fun|function|194a3c03afecc2bb
+figure2_correlation_plot|function|b35881086e54cc7a
+suppfigure3_corr_by_county|function|5a021cef33006bc8
+fpca_pipeline|function|44b7a77926fd8854
+figure1_change_from_baseline_fun|function|a7aefcbad40d692a
+figure3_CountyCloseReopen_fun|function|f39f4d18c0060df5
+kmeans_state|function|0602be3d14a34cef
+read_and_clean_cbg|function|f6139b6a5f6e6e24
+safegraph|stem|fe992a8af311b6cd|4eab9158fefcd569|3a777229b4482403|777049995|_targets/objects/safegraph|b7eb598dc27ac415|d9f193afad004cc4|120186753|rds|vector|||19.883||

@@ -1,0 +1,297 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+# {{state}} -- {{outcome_type}} -- {{metric_type}}
+
+
+```{r}
+# gam_res <- gam_result
+# index <- 1
+# gam2 <- gam_res[[index]]$GAM
+# cbgam2 <- gam_res[[index]]$cbgam
+# res <- gam_res[[index]]
+# summary(gam2)
+# gam.check(gam2)
+# par(mfrow=c(1,2)) # split graph window into 4 panels
+# plot(fitted(gam2),gam2$model$daily_count) # fitted vs. data plot
+# plot(fitted(gam2)^0.5,residuals(gam2)) # resids vs. sqrt(fitted)
+gam2 <- gam_result[[{{index}}]]$GAM
+cbgam2 <- gam_result[[{{index}}]]$cbgam
+res <- gam_result[[{{index}}]]
+summary(gam2)
+```
+
+## Time effect
+This show the effect of calendar time on incidence of cases/deaths, global and interaction with time:
+
+```{r}
+evaluate_smooth(gam2,"s(time)") %>% draw
+# evaluate_smooth(gam2,"s(baselineInc)") %>% draw
+```
+
+## Time by county interaction
+
+```{r}
+evaluate_smooth(gam2, "s(time,county)") %>% 
+        # mutate(est = exp(est)) %>% 
+        draw() + theme_minimal() + ylab("log(Predicted Cases by County)") + 
+        theme(legend.position = "none")
+
+plot(gam2, pages = 1)
+# evaluate_smooth(gam2, "te(SDmetricScaled,county_ccvi_score)") %>% 
+#         draw()
+
+```
+
+## PCA by CCVI quintile interaction
+
+
+```{r, eval=FALSE}
+evaluate_smooth(gam2, "s(SDmetricScaled,ccvi_quintile)") %>% 
+        # mutate(est = exp(est)) %>% 
+        draw(ci.level = 0.95) + theme_minimal() + ylab("log(Predicted Cases by County)") + 
+        geom_line(size=2)+
+        colorspace::scale_color_discrete_sequential("Viridis") + 
+        theme(legend.position = "bottom")
+```
+
+
+## 3d plot
+
+```{r}
+
+# cen <- quantile(res$DTfinal$SDmetricScaled, probs = 0.5)
+# cen <- quantile(DTfinal$SDmetricScaled, probs = 0.5)
+cen <- 0
+perc <- quantile(res$DTfinal$SDmetricScaled, probs = seq(0.1, 0.9, length.out = 75))
+# perc <- seq(-1,2, length.out = 75)
+# perc <- quantile(DTfinal$SDmetricScaled, probs = seq(0.1, 0.90, length.out = 75))
+
+predsdgam2 <- crosspred(cbgam2, gam2,
+                        at = perc,
+                        cen = cen)
+plot(predsdgam2,
+     xlab="{{metric_type}}",
+     zlab="RR",
+     exp = TRUE,
+     ltheta=170,
+     phi=10,
+     lphi=30,
+     main=sprintf("%s - %s - %s", '{{state}}', '{{outcome_type}}', '{{metric_type}}'))
+```
+
+## Contour plot
+
+```{r}
+plot(predsdgam2, 
+     "contour", 
+     xlab="{{metric_type}}",
+     key.title=title("RR"),
+     exp = TRUE,
+     plot.title=
+       title(sprintf("%s - %s - %s", '{{state}}', '{{outcome_type}}', '{{metric_type}}'),
+     xlab="{{metric_type}}",
+             ylab="Lag"))
+
+# plot(predsdgam2,"slices",ylab="RR",
+#      xlab="{{metric_type}}",
+#      var = quantile(res$DTfinal$SDmetricScaled, probs = c(0.1,0.9)),
+#      # ci = "n",
+#      # xlim=c(-1,2),
+#      ylim=c(0,5),
+#      lwd=1.5,
+#      main="Effect at 10th and 90th percentiles")
+
+# predslgam2 <- crosspred(cbgam2,gam2,by=0.01,bylag=1,cen=quantile(res$DTfinal$SDmetricScaled, probs = 0.5))
+# plot(predslgam2, "slices", 
+#      # var=c(-100, 100), 
+#      exp = FALSE,
+#      lag=c(7,11,14),
+#      col=4,
+#      ci.arg=list(density=40,col=grey(0.7)))
+
+
+# lower_lim <- floor(quantile(res$DTfinal$SDmetricScaled, probs = c(0.1)))
+```
+
+## By Z-score
+
+```{r}
+perc <- seq(-2,2, by = 0.5)
+# lims <- quantile(res$DTfinal$SDmetricScaled, probs = c(0.1, 0.90))
+
+predslgam2 <- crosspred(cbgam2, 
+                        gam2,
+                        at=perc,
+                        cen=cen,
+                        cumul = F)
+
+cols <- colorspace::sequential_hcl(n = length(perc), rev = TRUE, palette = "Viridis")
+
+# par(mfrow = c(3,3))
+layout(matrix(1:9, ncol = 3, byrow = TRUE), respect = FALSE)
+par(mar = c(3, 4.1, 0.5, 0))
+for(i in 1:length(perc)) { 
+        plot(predslgam2, "slices", 
+             var=perc[i], 
+             cumul = F,
+             ylim = round(range(predslgam2$matRRlow,predslgam2$matRRhigh),1),
+             # ci="n",
+             ci = "bars",
+             col=cols[i], 
+             ylab = "RR",
+             lwd=2.5)
+             # main=sprintf("%s Z-Score = %0.2f",
+                          # '{{metric_type}}',
+                          # perc[i]))
+        legend("topleft",paste(sprintf("%s Z-Score =",'{{metric_type}}'),perc[i]), col=cols[i], lwd=2, bty = TRUE)
+}
+```
+
+
+## By Lag
+
+```{r}
+lags <- 0:21
+# lims <- quantile(res$DTfinal$SDmetricScaled, probs = c(0.1, 0.90))
+
+predslgam2 <- crosspred(cbgam2, 
+                        gam2,
+                        lag=c(min(lags),max(lags)),
+                        cen=cen,
+                        cumul = F)
+
+
+
+cols <- colorspace::sequential_hcl(n = length(lags), rev = TRUE, palette = "Viridis")
+
+# par(mfrow = c(3,3))
+layout(matrix(1:25, ncol = 5, byrow = TRUE), respect = FALSE)
+par(mar = c(3, 4.1, 0.5, 0))
+for(i in 1:length(lags)) { 
+        plot(predslgam2, "slices", 
+             lag=lags[i], 
+             cumul = F,
+             xlim = c(-2,2),
+             ylim = round(range(predslgam2$matRRlow[which(predslgam2$predvar>=-2 & predslgam2$predvar<=2),],
+                                predslgam2$matRRhigh[which(predslgam2$predvar>=-2 & predslgam2$predvar<=2),]),1),
+             # ylim = c(0,3),
+             # ci="n",
+             ci = "bars",
+             col=cols[i], 
+             ylab = "RR",
+             lwd=2.5)
+             # main=sprintf("%s Z-Score = %0.2f",
+                          # '{{metric_type}}',
+                          # perc[i]))
+        legend("topleft",sprintf("Lag = %0.1f",lags[i]), col=cols[i], lwd=2, bty = TRUE)
+}
+
+plot.new()
+# plot(predslgam2, "slices", 
+#      var=perc[1], 
+#      cumul = F,
+#      # ci="n",
+#      ci = "bars",
+#      col=cols[1], 
+#      ylab = "RR",
+#      lwd=2,
+#      main=sprintf("%s Lag-response curves for different Z-Scores of %s,\n reference=median Z-score=%0.2f",
+#                   '{{state}}', 
+#                   '{{metric_type}}',
+#                   cen))
+# for(i in 2:length(perc)) lines(predslgam2, "slices", ci = "bars",
+#                     var=perc[i], col=cols[i], lwd=2)
+# legend("topright",paste(sprintf("%s Z-Score =",'{{metric_type}}'),perc), col=cols, lwd=2)
+```
+
+## Overall
+
+```{r}
+
+plot(predsdgam2,"overall",ylab="RR",
+     xlab="{{metric_type}}",
+     lwd=1.5,
+     main="Overall effect")
+
+
+```
+
+## crossbasis summary
+
+```{r}
+summary(cbgam2)
+```
+
+
+## Attributable Fractions (AF)
+
+```{r, echo=FALSE, results='asis'}
+# global backward attributable risk of temperature (number and fraction)
+# attrdl(res$DTfinal$SDmetricScaled,cbgam2,res$DTfinal$daily_count,gam2,type="an",cen=cen)
+est_af <- attrdl(res$DTfinal$SDmetricScaled,cbgam2,res$DTfinal$daily_count,gam2,cen=cen, type = "af")
+# empirical confidence intervals
+afsim <- attrdl(res$DTfinal$SDmetricScaled,cbgam2,res$DTfinal$daily_count,gam2,cen=cen,
+                sim=TRUE,nsim=10000)
+est_ci <- quantile(afsim,c(2.5,97.5)/100)
+
+knitr::kable(data.frame(AF = round(est_af,2), 
+                        `CI` = sprintf("[%0.2f, %0.2f]",est_ci[1],est_ci[2])))
+
+# global forward attributable fraction
+# attrdl(res$DTfinal$SDmetricScaled,cbgam2,res$DTfinal$daily_count,gam2,dir="forw",cen=cen)
+```
+
+
+
+
+
+```{r, eval=FALSE}
+summary(gam3)
+```
+
+<!--This show the effect of calendar time on incidence of cases, global and interaction with time:-->
+
+```{r, eval=FALSE}
+evaluate_smooth(gam3,"s(time)") %>% draw
+```
+
+```{r, eval=FALSE}
+evaluate_smooth(gam3, "s(time,county)") %>% draw
+```
+
+
+```{r, eval=FALSE}
+predsdgam3 <- crosspred(cbgam3,gam3,
+                        at=quantile(ressingle$DTfinal$SDmetricScaled, probs = seq(0.1, 0.90, length.out = 25)),
+                        cen=quantile(ressingle$DTfinal$SDmetricScaled, probs = 0.5))
+plot(predsdgam3,
+     xlab="device not home",
+     zlab="RR",
+     exp = TRUE,
+     ltheta=170,
+     phi=10,
+     lphi=30,
+     main="GAM - Device not home")
+
+plot(predsdgam3,"overall",ylab="RR",xlab="device not home",
+     # ci = "n",
+     # xlim=c(-1,2),
+     ylim=c(0,5),
+     lwd=1.5,
+     main="Overall effect - device not home")
+
+plot(predsdgam3, 
+     "contour", 
+     xlab="Device not home", 
+     key.title=title("RR"),
+     exp = TRUE,
+     plot.title=
+       title("Device not home - Model GS",
+             xlab="Device not home",
+             ylab="Lag"))
+
+```
+

@@ -17,6 +17,8 @@ fpca_pipeline <- function(jhu,
                           pop_data,
                           pcplot = FALSE,
                           data_with_cases = TRUE, # if true (and pcplot=FALSE), return SD data with cases, else only return SD data
+                          pve = FALSE, # return percent variance explained by 1st PC
+                          pcloadings = FALSE, # return loadings
                           metric_type = c("singleMetric", "cluster1"),
                           SD_metric,
                           cluster1 = c(
@@ -96,9 +98,21 @@ fpca_pipeline <- function(jhu,
         dplyr::select(all_of(cluster_cols)) %>%
         as.matrix() 
       
-      res2 <- prcomp(tpt, center = F, scale. = F)
+      res2 <- prcomp(tpt, rank. = 1, center = F, scale. = F)
+      # library(sparsepca)
+      # library("psych")
+      # tt <- principal(tpt, rotate = "simplimax")
+      # plot(tt$scores[,1], res2$x[,1])
+      # 
+      # summary(res2)
+      # tt <- spca(tpt, k=1, center = FALSE, scale = FALSE, alpha = 1e-1, beta = 1e-1)
+      # summary(tt)
+      # plot(tt$scores[,1],res2$x[,1])
+      # abline(a=0,b=1)
+      # res2$rotation
       # res2 %>% summary
-      
+      # varimax(res2$rotation)
+      # res2$rotation
       # all.equal(svd(tpt)$v[,1],
       #      res2$rotation[,1])
       # hist(res2$rotation[,1])
@@ -136,19 +150,37 @@ fpca_pipeline <- function(jhu,
       # par(mfrow = c(2,1))
       # plot(predict(loess(res2$x[,"PC1"]~as.numeric(dates_used))))
       # plot(predict(loess(res3$x[,"PC1"]~as.numeric(dates_used))))
+      # browser()
+      # res2$rotation
+      # promax(res2$rotation)
+      # 
       
-      if (!pcplot) {
+      if (!pcplot & !pve & !pcloadings) {
+        # return pc
         topp <- cbind(res2$x[,"PC1"])
         colnames(topp) <- ii
         return(topp)
-      } else {
+      } else if (!pcplot & pve & !pcloadings) {
         # browser()
+        # return pve
+        pve_pc1 <- (res2$sdev^2 / sum(res2$sdev^2))[1]
+        return(list(pve_pc1 = pve_pc1, state = state_name, county = cbg[fips==ii]$county))
+        
+      } else if (pcplot & !pve & !pcloadings){
+        # return pc with individual metrics
         topp <- cbind(res2$x[,"PC1"])
         colnames(topp) <- "FPCA"
         pc_with_indiv <- cbind(topp,tpt)
         dimnames(pc_with_indiv)[[1]] <- unique_SD_dates
         return(list(pc = pc_with_indiv, dates = unique_SD_dates, state = state_name, county = cbg[fips==ii]$county))
-        
+      } else if (!pcplot & !pve & pcloadings) {
+        # return loadings
+        # browser()
+        return(t(res2$rotation[,"PC1",drop=F]) %>% 
+                 as_tibble() %>% 
+                 mutate(county = cbg[fips==ii]$county, state = state_name) %>% 
+                 tidyr::pivot_longer(cols = -county:-state, names_to = "metric", values_to = "PC1_loading")
+        )
       }
     } else if (metric_type == "singleMetric") {
         sd_metrics_only <- safegraph %>%
@@ -164,7 +196,7 @@ fpca_pipeline <- function(jhu,
       }
   })
 
-  if (!pcplot) {
+  if (!pcplot & !pve & !pcloadings) {
     # I should be scaling it here, not after
     # this doesnt matter anymore since we're scaling from opening date
     SDdata_summarised <- do.call(cbind, SDdata) %>%
@@ -237,7 +269,6 @@ fpca_pipeline <- function(jhu,
   }
   
 }
-
 
 
 # this gives a fixed lag period

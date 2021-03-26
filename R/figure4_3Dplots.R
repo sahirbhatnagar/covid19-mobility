@@ -48,7 +48,7 @@ figure4_3Dplots_fun <- function(gam_result, n.points = 25){
               ncol = 4, 
               byrow = TRUE)
   
-  pdf(file="figure4_3Dplots.pdf", width = 12, height = 9)
+  pdf(file="figures/figure4_3Dplots.pdf", width = 12, height = 9)
   
   par(mar=c(1,1,1,1))
   layout(mat = m, heights = c(0.4,3,0.4,3))
@@ -208,7 +208,7 @@ figure4_3Dplots_fun <- function(gam_result, n.points = 25){
   
   dev.off()
   
-  return("figure4_3Dplots.pdf")
+  return("figures/figure4_3Dplots.pdf")
 }
 
 

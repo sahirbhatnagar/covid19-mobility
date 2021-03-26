@@ -3,7 +3,7 @@ figure2_correlation_data <- function(res2){
   
   # res2 is the result from fpca_pipeline function with pcplot=TRUE.
   # see targets::tar_load(pcplot_data)
-  # this gives, for each state, a tibble that has the metrics for each couty for each day
+  # this gives, for each state, a tibble that has the metrics for each county for each day
   ttt <- lapply(res2, function(STATE) {
     do.call(rbind, lapply(STATE, function(COUNTY){
       COUNTY$pc %>% 
@@ -23,7 +23,7 @@ figure2_correlation_data <- function(res2){
                                   
                                   ppp_STATE <- split(pp_STATE, pp_STATE$date)
                                   
-                                  # for each day, calculate the correlation betwe FPCA and single metric (the correlation is calculated across counties for a single day)
+                                  # for each day, calculate the correlation between FPCA and single metric (the correlation is calculated across counties for a single day)
                                   STATE_corr <- do.call(rbind,
                                                         lapply(ppp_STATE, function(DATE){
                                                           
@@ -53,12 +53,12 @@ figure2_correlation_data <- function(res2){
 figure2_correlation_plot <- function(fpca_corr_by_state){
 
   # pdf("figure2_correlation.pdf", width = 12, height = 9)
-  
+  # browser()
   p2 <- fpca_corr_by_state %>% 
     pivot_longer(-state:-date) %>% 
     mutate(name = factor(name), state=factor(state)) %>% 
     ggplot(aes(x = date, y = value, color = name)) + 
-    geom_smooth(method = "locfit", se = F) + 
+    geom_smooth(method = "locfit", se = F) +
     facet_wrap(~state) + 
     theme(legend.position = "bottom") + ylab("Correlation with MI") + 
     theme_cowplot() +
@@ -85,9 +85,9 @@ figure2_correlation_plot <- function(fpca_corr_by_state){
            fill = guide_legend(nrow=3, byrow=TRUE)) +
     scale_color_discrete_qualitative(palette = "Dynamic")
   
-  cowplot::save_plot("figure2_correlation.pdf", plot = p2, base_height = 7)
+  cowplot::save_plot("figures/figure2_correlation.pdf", plot = p2)
   
-  return("figure2_correlation.pdf")
+  return("figures/figure2_correlation.pdf")
 }
 
 

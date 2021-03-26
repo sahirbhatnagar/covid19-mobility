@@ -80,10 +80,10 @@ kmeans_state <- function(df){
   set.seed(123)
   final <- kmeans(df, 3, nstart = 25)
 
-  fviz_cluster(final, data = df)
+  p2 <- fviz_cluster(final, data = df) + cowplot::theme_cowplot()
   
-  ggsave(filename = "suppfigure1_kmeans_stats.pdf")
+  cowplot::save_plot(filename = "figures/suppfigure1_kmeans_stats.pdf", plot = p2, base_width = 10, base_height = 9)
   
-  return("suppfigure1_kmeans_stats.pdf")
+  return("figures/suppfigure1_kmeans_stats.pdf")
 
 }

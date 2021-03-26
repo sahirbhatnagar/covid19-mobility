@@ -124,10 +124,10 @@ figure1_change_from_baseline_fun <- function(DT_change){
     
     scale_color_discrete_qualitative(palette = "Dynamic")
   
-  cowplot::save_plot("figure1.pdf", plot = p1, base_height = 7)
+  cowplot::save_plot("figures/figure1_change_from_baseline.pdf", plot = p1)
   
   #dev.off()
   
-  return("figure1.pdf")
+  return("figures/figure1_change_from_baseline.pdf")
   
 }

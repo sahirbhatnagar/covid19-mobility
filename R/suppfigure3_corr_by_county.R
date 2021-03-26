@@ -21,7 +21,7 @@ suppfigure3_corr_by_county <- function(res2, index){
   
   i <- index
   
-  pdf(file = sprintf("suppfigure3_fpca_correlation_by_county_%s.pdf",unique(tt[[i]]$state)), height = 11, width = 8)
+  pdf(file = sprintf("figures/suppfigure3_fpca_correlation_by_county_%s.pdf",unique(tt[[i]]$state)), height = 11, width = 8)
   pheatmap::pheatmap(tt[[i]][,3:8],
                      cluster_rows = FALSE,
                      cluster_cols = FALSE,
@@ -30,6 +30,6 @@ suppfigure3_corr_by_county <- function(res2, index){
                      color = colorspace::diverge_hcl(length(seq(-1,1,by=0.2)) - 1))
   dev.off()
   
-  return(sprintf("suppfigure3_fpca_correlation_by_county_%s.pdf",unique(tt[[i]]$state)))
+  return(sprintf("figures/suppfigure3_fpca_correlation_by_county_%s.pdf",unique(tt[[i]]$state)))
   
 }

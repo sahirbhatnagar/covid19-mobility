@@ -3,11 +3,10 @@ tar_load(fpca_data_loadings)
 tt <- bind_rows(fpca_data_loadings[[1]],
                 fpca_data_loadings[[3]],
                 fpca_data_loadings[[5]],
-                fpca_data_loadings[[7]],
-                fpca_data_loadings[[9]])
+                fpca_data_loadings[[7]])
 
 tt %>% 
-  ggplot(aes(x = state, y = PC1_loading)) +
+  ggplot(aes(x = state, y = abs(PC1_loading))) +
   # ggplot(aes(x = metric, y = PC1_loading)) + 
   # geom_point() +
   # geom_text_repel() +
@@ -19,7 +18,7 @@ tt %>%
   theme_cowplot() +
   labs(
     x = "",
-    y = "Loadings for first fPCA") + 
+    y = "Loadings for first fPCA in absolute value") + 
   theme(
     legend.position="none",
     legend.title = element_text(size = 6),

@@ -6,7 +6,7 @@
 # gam_result <- gam_res
 # source("packages.R")
 # 
-# lapply(gam_result, function(i) unique(i$DTfinal$state))
+# lapply(gam_res, function(i) unique(i$DTfinal$state))
 # 
 # 
 # 
@@ -54,18 +54,18 @@ figure4_3Dplots_fun <- function(gam_result, n.points = 25){
   layout(mat = m, heights = c(0.4,3,0.4,3))
   # layout.show(n=14)
   plot.new()
-  text(0.5,0.5,"Ohio",cex=1.5,font=2)
+  text(0.5,0.5,"Illinois",cex=1.5,font=2)
   plot.new()
-  text(0.5,0.5,"Indiana",cex=1.5,font=2)
+  text(0.5,0.5,"Ohio",cex=1.5,font=2)
   
   
-  zlims_ohio <- range(sapply(rr[1:2], function(i) range(i$matRRfit)))
-  zlims_ind <- range(sapply(rr[7:8], function(i) range(i$matRRfit)))
+  zlims_il <- range(sapply(rr[1:2], function(i) range(i$matRRfit)))
+  zlims_ohio <- range(sapply(rr[3:4], function(i) range(i$matRRfit)))
   
   # my_cols <- viridis::inferno(n = 30, direction = -1)
   my_cols <- "#A6E1F4"
   
-  lapply(c(1,2,7,8), function(index) {
+  lapply(c(1,2,3,4), function(index) {
     
     # c(bottom, left, top, right)
     gam2 <- gam_result[[index]]$GAM
@@ -73,9 +73,9 @@ figure4_3Dplots_fun <- function(gam_result, n.points = 25){
     res <- gam_result[[index]]  
     
     if (index %in% c(1,2)) { 
-      zlims_plot <- zlims_ohio 
+      zlims_plot <- zlims_il 
     } else {
-      zlims_plot <- zlims_ind
+      zlims_plot <- zlims_ohio
     }
     
     cen <- 0
@@ -133,26 +133,26 @@ figure4_3Dplots_fun <- function(gam_result, n.points = 25){
   
   
   plot.new()
-  text(0.5,0.5,"Missouri",cex=1.5,font=2)
+  text(0.5,0.5,"Michigan",cex=1.5,font=2)
   plot.new()
-  text(0.5,0.5,"South Carolina",cex=1.5,font=2)
+  text(0.5,0.5,"Indiana",cex=1.5,font=2)
   
   lapply(rr, function(i) i$state)
   
-  zlims_mo <- range(sapply(rr[3:4], function(i) range(i$matRRfit)))
-  zlims_sc <- range(sapply(rr[5:6], function(i) range(i$matRRfit)))
+  zlims_mich <- range(sapply(rr[5:6], function(i) range(i$matRRfit)))
+  zlims_in <- range(sapply(rr[7:8], function(i) range(i$matRRfit)))
   
-  lapply(c(3,4,5,6), function(index) {
+  lapply(c(5,6,7,8), function(index) {
     
     # c(bottom, left, top, right)
     gam2 <- gam_result[[index]]$GAM
     cbgam2 <- gam_result[[index]]$cbgam
     res <- gam_result[[index]]  
     
-    if (index %in% c(3,4)) { 
-      zlims_plot <- zlims_mo
+    if (index %in% c(5,6)) { 
+      zlims_plot <- zlims_mich
     } else {
-      zlims_plot <- zlims_sc
+      zlims_plot <- zlims_in
     }
     
     cen <- 0

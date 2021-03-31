@@ -192,7 +192,7 @@ figure3_CountyCloseReopen_fun <- function(res, input.params, today = "2020-12-08
                          #            0, 0.1, 0.25, 0.5,
                          #            1, 1.5, 3))
   
-  cowplot::save_plot("figure3_CloseReopen.pdf", plot = p3, base_height = 7)
+  cowplot::save_plot("figures/figure3_CloseReopen.pdf", plot = p3, base_height = 7)
   
   return("figures/figure3_CloseReopen.pdf")
   

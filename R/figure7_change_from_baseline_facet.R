@@ -10,7 +10,7 @@
 # source("R/figure1_change_from_baseline.R")
 # tar_load(nyt)
 # tar_load(SES)
-# tar_load(popDensity)
+# tar_load(pop_density)
 # tar_load(cbg)
 # tar_load(safegraph)
 # source("R/fpca_pipeline.R")
@@ -27,36 +27,44 @@
 
 
 
-figure7_change_from_baseline_ma <- function(DT_change, pop_density, params, ma_days = 14, n.counties.to.plot = c(NA,10)) {
+figure7_change_from_baseline_ma <- function(DT_change, pop_density, input.params, ma_days = 14, n.counties.to.plot = NULL) {
   
   # DT_change is safegraph data in targets
   # pop_density is popDensity in targets. used only if we want to plot subset of counties.
-  # params is 
+  # input.params is params in targets
   # ma_days is the rolloing average days. larger means more smoothing
   # n.counties.to.plot is how many counties to plot. if NA, then plot all
   # if a number, then plot the top n counties with the highest density
-  n.counties.to.plot <- match.arg(n.counties.to.plot)
-  
-  DT_change <- safegraph
-  
+  # n.counties.to.plot <- match.arg(n.counties.to.plot)
+
   DT_change$date <- lubridate::ymd(DT_change$date)
   
-  # Plot one names 
-  DT_change$state[(DT_change$state) == "OH"] <- "Ohio"
-  DT_change$state[(DT_change$state) == "MO"] <- "Missouri"
-  DT_change$state[(DT_change$state) == "SC"] <- "South Carolina"
-  DT_change$state[(DT_change$state) == "IN"] <- "Indiana"
+  # browser()
+  
+  DT_change <- DT_change %>% 
+    left_join(
+      dplyr::select(
+      dplyr::filter(
+        input.params, pc_metric_type=="cluster1"
+        ),
+      state_code, state_name
+      ), 
+      by = c("state" = "state_code")) %>% 
+    mutate(state = state_name) %>% 
+    dplyr::filter(!is.na(state))
+  
+
+  # States of interest for plot one 
+  focus_cn <- dplyr::filter(
+    input.params, pc_metric_type=="cluster1"
+  )$state_name
   
   # Plot one order
   DT_change$state = factor(DT_change$state, 
-                           levels=c("Ohio","Indiana", 
-                                    "Missouri","South Carolina"))
+                           levels=focus_cn)
   
-  # States of interest for plot one 
-  focus_cn <- c("Ohio", "Missouri","South Carolina", "Indiana")
   
-
-  params <- dplyr::filter(params, pc_metric_type == "cluster1") %>% 
+  params <- dplyr::filter(input.params, pc_metric_type == "cluster1") %>% 
     dplyr::select(state_name,close, open)
   
   DT <- DT_change %>% 
@@ -76,12 +84,11 @@ figure7_change_from_baseline_ma <- function(DT_change, pop_density, params, ma_d
     mutate(value = value / 100) %>% 
     left_join(params, by = c("state" = "state_name")) %>% 
     mutate(state = factor(state, 
-                          levels=c("Ohio","Indiana", 
-                                   "Missouri","South Carolina"))) %>% 
-    left_join(popDensity, by = "fips")
+                          levels=focus_cn)) %>% 
+    left_join(pop_density, by = "fips")
   
   
-  if (!is.na(n.counties.to.plot)) {
+  if (!is.null(n.counties.to.plot)) {
     
     most_dense_fips_by_state <- DT %>% 
       group_by(state, fips) %>% 
@@ -121,12 +128,12 @@ figure7_change_from_baseline_ma <- function(DT_change, pop_density, params, ma_d
   DT_dense <- DT_dense %>% 
     left_join(metric_names, by = "metric")
   
-ggplot() + 
+p1 <- ggplot() + 
     geom_line(data = DT_dense, aes(x = date, y = value, color = metric_name), alpha = 0.8, size = 0.3) +
     # geom_point(data = DT_dense, aes(x = date, y = value, group = fips), alpha = 0.3) +
     # geom_smooth(data = DT_dense, aes(x = date, y = value, group = fips), method = "loess", size = 0.5, se = F) +
     # facet_grid(state ~ metric_name) + 
-  facet_grid(metric_name ~ state) + 
+  facet_grid(metric_name ~ state, scales = "free") + 
     scale_x_date(date_breaks = "1 month", date_labels = "%b") +
     
     scale_y_continuous(labels = scales::percent_format()) +
@@ -164,8 +171,8 @@ ggplot() +
     
     scale_color_discrete_qualitative(palette = "Dynamic")
   
-  cowplot::save_plot("figure7_change_from_baseline_ma.pdf",p1,base_width = 11, base_height = 9)
+  cowplot::save_plot("figures/figure7_change_from_baseline_ma.pdf",p1,base_width = 11, base_height = 9)
   
-  return(figure7_change_from_baseline_ma.pdf)
+  return("figures/figure7_change_from_baseline_ma.pdf")
   
 }

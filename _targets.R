@@ -17,15 +17,20 @@ library(tarchetypes)
 source("R/fpca_pipeline.R")
 source("R/map_cbg_to_fips.R")
 source("R/input_parameters.R")
+source("R/sd_policy.R")
+source("R/table2_pve.R")
 source("R/figure1_change_from_baseline.R")
 source("R/figure2_correlation_MI.R")
 source("R/figure3_CountyCloseReopen.R")
 source("R/figure4_3Dplots.R")
+source("R/figure5_prop_var_explained.R")
+source("R/figure7_change_from_baseline_facet.R")
+source("https://github.com/gasparrini/2014_gasparrini_BMCmrm_Rcodedata/raw/master/attrdl.R")
 source("R/suppfigure1_kmeans.R")
 source("R/suppfigure3_corr_by_county.R")
-source("https://github.com/gasparrini/2014_gasparrini_BMCmrm_Rcodedata/raw/master/attrdl.R")
-source("R/map_gif.R")
-source("R/CCVI_themes.R")
+# source("R/suppfigure2_MapGif.R")
+source("R/suppfigure2_MapGif-v2.R")
+source("R/suppfigure4_MI_CCVIQuintile.R")
 
 # figure3_CountyCloseReopen_fun(res = fpca_data, input.params = input_params())
 
@@ -75,7 +80,9 @@ tar_option_set(packages = c(
   "transformr",
   "magick",
   "ggpubr",
-  "ggplot2"
+  "ggplot2",
+  "zoo",
+  "qwraps2"
 )
 )
 
@@ -84,11 +91,28 @@ conflicted::conflict_prefer("lag", "dplyr")
 conflicted::conflict_prefer("Position", "ggplot2")
 conflicted::conflict_prefer("rbind", "BiocGenerics")
 conflicted::conflict_prefer("cbind", "BiocGenerics")
-doParallel::registerDoParallel(cores = 30)
+conflicted::conflict_prefer("month", "lubridate")
+conflicted::conflict_prefer("which", "Matrix")
+
+doParallel::registerDoParallel(cores = 20)
+
+# tar_make(names = c("params","params2","fpca_cases_data","gam_res","report"))
 
 
 # End this file with a list of target objects.
 list(
+  
+  # Aggregated safegraph data -------------------------------------
+  tar_target(
+    aggregated_safegraph_path, 
+    "data/aggregated_2020-12-08_2020.csv",
+    format = "file"
+  ),
+  
+  tar_target(
+    aggregated_safegraph, 
+    readr::read_csv(aggregated_safegraph_path)
+  ),
 
   # cbg data --------------------------------------------------------------
   tar_target(
@@ -106,7 +130,7 @@ list(
   # safegraph change from baseline data -------------------------------------
   tar_target(
     safegraph_path, 
-    "data/2020_change_2020_baselines_Dec08.csv",
+    "data/2020_change_2020_rolling_baseline_Dec08.csv",
     format = "file"
   ),
   
@@ -136,8 +160,14 @@ list(
     lapply(seq_along(state_names$iso2c), function(i) state_names[i,,drop=TRUE])
     ),
   
-  
 
+  # sd policy data ----------------------------------------------------------
+
+  tar_target(
+    sdpolicy_data,
+    sars2pack::us_state_distancing_policy()
+  ),
+  
   # case data ---------------------------------------------------------------
 
   tar_target(
@@ -197,7 +227,12 @@ list(
 
   tar_target(
     params,
-    input_params()
+    input_params(sdpolicy_raw_data = sdpolicy_data, 
+                 state_names = c("IL.Illinois",
+                                 "OH.Ohio",
+                                 "MI.Michigan",
+                                 "IN.Indiana")
+                 )
   ),
   
   tar_target(
@@ -209,7 +244,7 @@ list(
 
   # run fpca pipeline for each state ----------------------------------------
 
-  # this returns a list with with safegraph data only (without cases): 
+  # this returns a list with with safegraph data only from opening date (without cases): 
   tar_target(
     fpca_data,
     mapply(FUN = fpca_pipeline,
@@ -238,6 +273,70 @@ list(
            ),
            SIMPLIFY = FALSE)
   ),
+  
+  # this return the proportion variance explained
+  tar_target(
+    fpca_data_pve,
+    mapply(FUN = fpca_pipeline,
+           metric_type = params$pc_metric_type,
+           type_of_outcome = params$type_of_outcome,
+           state_code = params$state_code,
+           state_name = params$state_name,
+           close_date = params$close,
+           open_date = params$open,
+           MoreArgs = list(jhu = nyt,
+                           safegraph = safegraph,
+                           cbg = cbg,
+                           ses_data = SES,
+                           pop_data = popDensity,
+                           pcplot = FALSE, 
+                           data_with_cases = FALSE,
+                           pve = TRUE,
+                           SD_metric = "not_at_home_device_count_change",
+                           cluster1 = c(
+                             "full_time_work_behavior_devices_change",
+                             "part_time_work_behavior_devices_change",
+                             "not_at_home_device_count_change",
+                             "delivery_behavior_devices_change",
+                             "median_distance_traveled_from_home_change",
+                             "median_non_home_dwell_time_change"
+                           )
+           ),
+           SIMPLIFY = FALSE)
+  ),
+  
+  # this returns the loadings for PC1
+  tar_target(
+    fpca_data_loadings,
+    mapply(FUN = fpca_pipeline,
+           metric_type = params$pc_metric_type,
+           type_of_outcome = params$type_of_outcome,
+           state_code = params$state_code,
+           state_name = params$state_name,
+           close_date = params$close,
+           open_date = params$open,
+           MoreArgs = list(jhu = nyt,
+                           safegraph = safegraph,
+                           cbg = cbg,
+                           ses_data = SES,
+                           pop_data = popDensity,
+                           pcplot = FALSE, 
+                           data_with_cases = FALSE,
+                           pve = FALSE,
+                           pcloadings = TRUE,
+                           SD_metric = "not_at_home_device_count_change",
+                           cluster1 = c(
+                             "full_time_work_behavior_devices_change",
+                             "part_time_work_behavior_devices_change",
+                             "not_at_home_device_count_change",
+                             "delivery_behavior_devices_change",
+                             "median_distance_traveled_from_home_change",
+                             "median_non_home_dwell_time_change"
+                           )
+           ),
+           SIMPLIFY = FALSE)
+  ),
+  
   
   # this has the safegraph data with case data from nyt
   # there will be differences between fpca_data and fpca_cases_data. depending on which days case data was
@@ -272,7 +371,7 @@ list(
   ),
   
 
-  # run fpca pipeline to extract just the correlations for Figure 2 ----------
+  # run fpca pipeline to extract just the correlations for Figure 2 and supp figure 3 ----------
 
   tar_target(
     pcplot_data,
@@ -319,24 +418,12 @@ list(
       if (unique(DTfinal$outcome_type) == "confirmed") {
         lag_period <- 21
       } else {
-        lag_period <-  c(25,35)
+        lag_period <-  30
       }
       
       
       tryCatch(
         expr = {
-          
-          # cbgam2 <- dlnm::crossbasis(x = DTfinal$SDmetricScaled,
-          #                            lag=lag_period,
-          #                            argvar=list(fun="ns",
-          #                                        knots = seq(-2,2, by = 0.5)
-          #                            ),
-          #                            arglag=list(
-          #                              fun = "ns",
-          #                              knots = c(7,11),
-          #                              int = TRUE # null risk at lag 4 (see http://www.ag-myresearch.com/uploads/1/3/8/6/13864925/2014_gasparrini_statmed.pdf section 3.2)
-          #                            ),
-          #                            group=DTfinal$county)
           
           cbgam2 <- crossbasis(x = DTfinal$SDmetricScaled,
                                lag = lag_period,
@@ -372,15 +459,50 @@ list(
 
   tar_render(
     report,
-    "report_4states.Rmd"
+    "report/report_4states.Rmd"
   ),
   
 
+  # PVE table ---------------------------------------------------------------
+
+  tar_target(
+    pve_table,
+    table2_pve(pve_list = fpca_data_pve, input.params = params2)
+  ),
+  
+
+
+  # cases at open and today -------------------------------------------------
+
+  # state populations
+  tar_target(
+    state_pops,
+    covdata::uspop %>%
+      dplyr::filter(sex_id == "totsex", hisp_id == "tothisp") %>%
+      dplyr::select(state_abbr, statefips, pop, state) %>%
+      dplyr::rename(name = state, 
+                    state = state_abbr, fips = statefips) %>%
+      dplyr::mutate(state = replace(state, fips == "11", "DC"))
+  ), 
+  
+  tar_target(
+    cases_open_today,
+    covdata::nytcovstate %>%
+      dplyr::filter(state %in% params2$state_name) %>%
+      dplyr::mutate(state = factor(state, levels = params2$state_name)) %>% 
+      dplyr::group_by(state) %>%
+      dplyr::left_join(state_pops, by = c("state" = "name")) %>%
+      dplyr::left_join(params2, by = c("state" = "state_name")) %>% 
+      dplyr::mutate(cases.per.capita = (cases/pop)*1e5) %>% 
+      dplyr::filter(date == open | date == ymd("2020-12-08"))
+  ),
+  
+  
   # Figure 1 ----------------------------------------------------------------
 
   tar_target(
-     figure1_change_from_baseline,
-     figure1_change_from_baseline_fun(safegraph),
+     figure1,
+     figure1_change_from_baseline_fun(DT_change = safegraph, input.params = params),
      format = "file"
    ),
   
@@ -388,7 +510,7 @@ list(
   # Figure 2 ----------------------------------------------------------------
   
   tar_target(
-    figure2_correlation_MI,
+    figure2,
     figure2_correlation_plot(correlation_data),
     format = "file"
   ),
@@ -397,8 +519,8 @@ list(
   # Figure 3 ----------------------------------------------------------------
 
   tar_target(
-    figure3_CountyCloseReopen,
-    figure3_CountyCloseReopen_fun(res = fpca_data, input.params = params, today = "2020-12-08"),
+    figure3,
+    figure3_CountyCloseReopen_fun(res = fpca_data, input.params = params, today = "2020-07-04"),
     format = "file"
   ),
   
@@ -406,12 +528,31 @@ list(
   # Figure 4 ----------------------------------------------------------------
 
   tar_target(
-    figure4_3Dplots,
+    figure4,
     figure4_3Dplots_fun(gam_result = gam_res, n.points = 25),
     format = "file"
   ),
   
+  # Figure 5 ----------------------------------------------------------------
 
+  tar_target(
+    figure5,
+    figure5_prop_var_explained(pve_list = fpca_data_pve, input.params = params2),
+    format = "file"
+  ),
+  
+
+
+  # Figure 7 ----------------------------------------------------------------
+
+  tar_target(
+    figure7,
+    figure7_change_from_baseline_ma(DT_change = safegraph, pop_density = popDensity, 
+                                    input.params = params, ma_days = 7),
+    format = "file"
+  ),
+  
+  
 
   # Supplemental Figure 1 --------------------------------------------------
 
@@ -430,21 +571,21 @@ list(
   
   # Supplemental Figure 3 ---------------------------------------------------
 
-  # Ohio
+  # Illinois
   tar_target(
     suppfig3.1,
     suppfigure3_corr_by_county(res = pcplot_data, index = 1),
     format = "file"
   ),
   
-  # Missouri
+  # Ohio
   tar_target(
     suppfig3.2,
     suppfigure3_corr_by_county(res = pcplot_data, index = 2),
     format = "file"
   ),
   
-  # SC
+  # Michigan
   tar_target(
     suppfig3.3,
     suppfigure3_corr_by_county(res = pcplot_data, index = 3),
@@ -458,10 +599,10 @@ list(
     format = "file"
   ),
   
-  # map GIF ----
+  # # map GIF ----
   tar_target(
     map_gif,
-    map_gif_fun(res = fpca_data),
+    map_gif_fun(res = fpca_data, input.params = params2),
     format = "file"
   ),
   
@@ -471,10 +612,12 @@ list(
     CCVI_themes_fun(res = fpca_cases_data),
     format = "file"
   )
-  
 )
   
   
-  
-  
-  
+
+
+
+
+
+

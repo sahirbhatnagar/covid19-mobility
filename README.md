@@ -1,5 +1,8 @@
 # COVID and Mobility with SafeGraph Data
 
+![](suppfigure2_map.gif)
+
+
 ## Manuscript with Sahar and Peter
 
 - 00-analysis-state.R has the master file to run the analysis and it uses MO_OH_Aug_2.Rmd and fpca_single_template.Rmd to generate the results.
